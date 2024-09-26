@@ -1,0 +1,13 @@
+---
+- name: Remove unused Docker images
+  hosts: all
+  become: yes
+  tasks:
+    - name: Remove unused Docker images
+      shell: |
+        docker image prune -f
+      register: result
+
+    - name: Show result of image prune
+      debug:
+        var: result.stdout
