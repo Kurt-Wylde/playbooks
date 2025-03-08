@@ -12,3 +12,7 @@
       changed_when: false
       check_mode: false
       register: disk_usage
+
+    - name: Show disk space usage
+      debug:
+        msg: "Disk usage on {{ inventory_hostname }}: {{ disk_usage.stdout }}"
