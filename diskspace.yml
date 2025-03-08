@@ -1,18 +1,27 @@
 ---
 - name: Check disk space
   hosts: all
-
+  become: true
   tasks:
     - name: Check disk space available
       ansible.builtin.shell:
         cmd: |
           set -euo pipefail
-          df -Ph / | awk 'NR==2 {print $5}'
+          df -Ph / | awk 'NR==2 {print $5}' | tr -d '%'
         executable: /bin/bash
       changed_when: false
       check_mode: false
       register: disk_usage
 
-    - name: Show disk space usage
+    - name: Evaluate disk usage status
+      set_fact:
+        disk_status: >-
+          {{
+            'ALERT: ' + disk_usage.stdout + '% (Critical!)' if (disk_usage.stdout | int) > 80
+            else 'OK: ' + disk_usage.stdout + '%'
+          }}
+
+    - name: Show disk space usage with status
       debug:
-        msg: "Disk usage on {{ inventory_hostname }}: {{ disk_usage.stdout }}"
+        msg: "Disk usage on {{ inventory_hostname }} -> {{ disk_status }}"
+      failed_when: (disk_usage.stdout | int) > 90 # Если > 90% — падаем с ошибкой
