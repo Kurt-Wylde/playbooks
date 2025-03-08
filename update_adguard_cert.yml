@@ -1,6 +1,6 @@
 ---
 - name: Renew SSL certificates
-  hosts: your_target_server
+  hosts: adguard
   become: true
   tasks:
     - name: Ensure the script is executable
