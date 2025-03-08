@@ -1,0 +1,18 @@
+---
+- name: Update AdGuard Home Docker container
+  hosts: adguard
+  become: true
+  tasks:
+    - name: Ensure AdGuard update script is executable
+      file:
+        path: /root/adguard_dockerupdate.sh
+        mode: "0755"
+
+    - name: Run AdGuard Docker update script
+      command: /root/adguard_dockerupdate.sh
+      register: adguard_update_output
+      changed_when: "'adguard/adguardhome' in adguard_update_output.stdout"
+
+    - name: Print AdGuard update output
+      debug:
+        var: adguard_update_output.stdout
