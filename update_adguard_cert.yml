@@ -1,0 +1,18 @@
+---
+- name: Renew SSL certificates
+  hosts: your_target_server
+  become: true
+  tasks:
+    - name: Ensure the script is executable
+      file:
+        path: /root/renew_certificates.sh
+        mode: "0755"
+
+    - name: Run the certificate renewal script
+      command: /root/renew_certificates.sh
+      register: cert_renew_output
+      changed_when: "'Сертификат обновлен' in cert_renew_output.stdout"
+
+    - name: Print script output
+      debug:
+        var: cert_renew_output.stdout
